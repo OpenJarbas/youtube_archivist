@@ -3,6 +3,7 @@ from json_database import JsonStorageXDG
 
 
 LOG = getLogger("youtube_archivist")
+LOG.setLevel("DEBUG")
 
 
 class JsonArchivist:
@@ -18,11 +19,17 @@ class JsonArchivist:
     def archive(self, url):
         raise NotImplementedError
 
+    def sorted_entries(self):
+        return sorted([e for e in self.db.values()],
+                      key=lambda k: k.get("upload_ts"),
+                      reverse=True)
+
     # DB interaction
     def remove_unavailable(self):
         pass
 
-    def remove_keyword(self, kwords):
+    def remove_keyword(self, kwords=None):
+        kwords = kwords or self.blacklisted_kwords
         bad_urls = []
         for url, entry in self.db.items():
             name = entry["title"]

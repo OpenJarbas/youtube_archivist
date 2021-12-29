@@ -32,15 +32,15 @@ class YoutubeArchivist(JsonArchivist):
                 # accessing the title property might cause a 404 if
                 # video was removed
                 raise
+        del video
 
     def archive_playlist(self, url):
         c = Playlist(url)
-        for video in c.videos:
+        try:
+            meta = {"playlist": c.title}
+        except:
             meta = {}
-            try:
-                meta = {"playlist": c.title}
-            except:
-                pass
+        for video in c.videos:
             self.archive_video(video, meta)
 
     def archive_channel(self, url):
@@ -52,13 +52,11 @@ class YoutubeArchivist(JsonArchivist):
     def archive_channel_playlists(self, url):
         c = Channel(url)
         for pl in c.playlists:
-            for video in pl.videos:
+            try:
+                meta = {"playlist": pl.title}
+            except:
                 meta = {}
-                try:
-                    meta = {"playlist": pl.title}
-                except:
-                    pass
-
+            for video in pl.videos:
                 try:
                     self.archive_video(video, meta)
                 except VideoUnavailable:
@@ -85,6 +83,7 @@ class YoutubeArchivist(JsonArchivist):
 
     # DB interaction
     def remove_unavailable(self):
+        to_remove = []
         for url, entry in self.db.items():
             vid = Video(url)
             try:
@@ -95,6 +94,8 @@ class YoutubeArchivist(JsonArchivist):
                     "title": vid.title
                 }
             except VideoUnavailable:
-                self.db.pop(url)
-                LOG.info("Removed entry: " + url)
+                to_remove.append(url)
+        for url in to_remove:
+            self.db.pop(url)
+            LOG.info("Removed entry: " + url)
         self.db.store()

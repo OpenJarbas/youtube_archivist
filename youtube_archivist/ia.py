@@ -39,6 +39,8 @@ class IAArchivist(JsonArchivist):
                 movie["streams"].append(stream)
             if f["format"] in ["PNG"]:
                 movie["images"] += [item.urls.download + "/" + f["name"]]
+        if not movie["streams"]:
+            return
         if any(k.lower() in movie["title"].lower() for k in
                self.blacklisted_kwords):
             return
