@@ -13,6 +13,12 @@ class IAArchivist(JsonArchivist):
         except:
             self.archive_collection(url)
 
+    def bootstrap_from_url(self, url):
+        self.log.info(f"Bootstrapping database from: {url}")
+        cache = requests.get(url).json()
+        self.db.update(cache)
+        self.db.store()
+
     def archive_item(self, item_id):
         item = ia.get_item(item_id)
         meta = requests.get(item.urls.metadata).json()
@@ -47,7 +53,9 @@ class IAArchivist(JsonArchivist):
         if any(k.lower() not in movie["title"].lower() for k in
                self.required_kwords):
             return
-        LOG.info("Parsing video " + movie["title"])
+        #if movie["duration"] < self.min_duration:
+        #    return
+        self.log.info("Parsing video " + movie["title"])
         self.db[item_id] = movie
         self.db.store()
 

@@ -7,10 +7,12 @@ LOG.setLevel("DEBUG")
 
 
 class JsonArchivist:
-    def __init__(self, db_name=None, required_kwords=None, blacklisted_kwords=None):
+    def __init__(self, db_name=None, required_kwords=None, blacklisted_kwords=None, min_duration=-1, logger=LOG):
         self.required_kwords = required_kwords or []
         self.blacklisted_kwords = blacklisted_kwords or []
         self.db = JsonStorageXDG(db_name, subfolder="youtube_archivist")
+        self.min_duration = min_duration
+        self.log = logger
 
     @property
     def video_urls(self):

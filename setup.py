@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='youtube_archivist',
-    version='0.0.2',
+    version='0.0.3a1',
     packages=['youtube_archivist'],
     url='https://github.com/OpenJarbas/youtube_archivist',
     license='apache2',
