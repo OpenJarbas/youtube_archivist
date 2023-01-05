@@ -59,23 +59,23 @@ class YoutubeMonitor(Thread):
 
         while self.monitoring.is_set():
             url = self.queue.get()
-
-            # index url contents
-            try:
-                self._index_url(url)
-            except Exception as e:
-                self.log.exception(e)
-                pass
-
+            self.parse_videos(url)
             # sleep for a while
             time.sleep(120)
-
             # keep monitoring url
             if url in self.repeat_list:
                 self.queue.put(url)  # sync this url again
 
     def sync(self, url):
         self.queue.put(url)
+
+    def parse_videos(self, url):
+        # index url contents
+        try:
+            self._index_url(url)
+        except Exception as e:
+            self.log.exception(e)
+            pass
 
     def monitor(self, url):
         if url not in self.repeat_list:
